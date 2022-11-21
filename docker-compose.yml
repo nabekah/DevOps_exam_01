@@ -1,0 +1,28 @@
+version: "3"
+services:
+    book_db:
+        image: postgres:12-alpine
+        container_name: book_db
+        restart: on-failure
+        env_file:
+          - ./gutendex/.env.template  
+        
+        environment:
+          POSTGRES_DB: gutendex
+          POSTGRES_USER: gutendex
+          POSTGRES_PASSWORD: 54mypass32
+          PGDATA: mydbdata
+        volumes:
+          - mydbdata:/var/lib/postgresql/data/pgdata
+    book_backend:
+        build: .
+        container_name: book_backend
+        environment:
+          BIND_HOST: book_backend
+          BIND_PORT: 5003
+
+volumes:
+  mydbdata:
+
+
+        
