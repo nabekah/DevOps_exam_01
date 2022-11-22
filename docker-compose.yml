@@ -1,28 +1,77 @@
 version: "3"
 services:
     book_db:
-        image: postgres:12-alpine
+        image: postgres:9.5
         container_name: book_db
         restart: on-failure
         env_file:
-          - ./gutendex/.env.template  
+          - ./gutendex/.env 
         
         environment:
           POSTGRES_DB: gutendex
           POSTGRES_USER: gutendex
-          POSTGRES_PASSWORD: 54mypass32
+          POSTGRES_PASSWORD: mypass
           PGDATA: mydbdata
         volumes:
-          - mydbdata:/var/lib/postgresql/data/pgdata
+          - mydbdata:/var/lib/postgresql/data
+        healthcheck:
+          test: ["CMD", "pg_isready", "-d", "gutendex"]
+          timeout: 60s
+          retries: 5
+        networks:
+          - books_backend
+        # ports:
+        #   - 5111:5432
+
+
     book_backend:
         build: .
         container_name: book_backend
+        restart: always
         environment:
           BIND_HOST: book_backend
-          BIND_PORT: 5003
+          BIND_PORT: 
+          DATABASE_HOST: book_db
+          ALLOWED_HOSTS: book_backend,localhost,0.0.0.0
+          DATABASE_NAME: gutendex
+          DATABASE_USER: gutendex
+          DATABASE_PASSWORD: mypass
+
+        ports:
+          - 5003:8000
+        networks:
+          - books_backend
+          - books_frontend
+        depends_on:
+          book_db:
+            condition: service_healthy
+        volumes:
+          - static_files:/var/www/gutendex/static-root  
+
+
+    book_web:
+        build:
+          context: ./nginx/
+        container_name: book_web
+        ports:
+          - 8088:80
+        volumes:
+           - ./nginx/conf.d/:/etc/nginx/conf.d/
+           - static_files:/home/app/static
+        networks:
+           - books_frontend
+        restart: always
+        depends_on:
+          - book_backend
+            
 
 volumes:
   mydbdata:
+  static_files:
+
+networks:
+  books_backend:
+  books_frontend:
 
 
         
