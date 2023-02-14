@@ -1,0 +1,48 @@
+Exam 1
+======
+
+General
+-------
+Project Gutenberg is a public store of books that are in public domain.
+The application you are about to dockerize, "Gutindex", builds a searchable index of all the books in Project Gutenberg and allows users to search by book name, author etc.
+
+Technology stack:
+- Postgres to store and manage the index.
+- Python & Django to create the index and serve the files.
+- Static HTML & JS to make a lovely UI for people that want to try out the API.
+
+
+Task/workplan
+-------------
+You will use docker-compose to setup your service topology:
+- Postgres database.
+- Gutendex back end.
+- Nginx for serving the static files and as a reverse proxy.
+
+1. Setup the Postgres database:
+   - Database data should be persisted between restarting of containers.
+2. Dockerize the Gutendex application:
+   - Source code is in `project/` directory.
+   - No need to implement any E-mailing system.
+   - You need to handle all installation aspects: the app, the schema, the data upload on initialization, etc.
+   - Starting a system from scratch (empty volumes) must be stable, regardless of the order in which containers start being functional!
+   - Catalog data should be persisted between restarting of containers.
+3. Setup Nginx:
+   - As a reverse proxy, exposing the back end application.
+   - Harden the toplogy using appropriate network isolation between the front and back end services.
+   - Configure Nginx to serve the static files. Remove the static files entirely from the back end.
+4. Testing:
+   - Back end: Once the system is set up, you should be able to find out how many Arthur Conan Doyle books are found in the database by curling `/books/?search=arthur%20conan%20doyle`. The expected result should contain 14.
+   - Front end: Once the static files are removed from the back end, make sure that the static files are still available when served from the front end (Nginx).
+
+See additional details in the Installation Guide...
+
+
+Tips
+----
+- Concentrate on making things work first. Optimize later.
+- Take into account that some aspects of the installation guide may be meant for a *monolithic* architecture, wheras we are doing a [dockerized] microservices' architecture (see for example the `ALLOWED_HOSTS` environment variable).
+- This is a fork of the original Gutendex project (from GitHub). Our copy is *easier* to dockerize - so *do not* try to dockerize the one on github!
+
+
+Good Luck!
